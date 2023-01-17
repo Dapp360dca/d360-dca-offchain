@@ -1,3 +1,20 @@
+export const getAccounts = async (address: string) => {
+  var allAccounts: any = [];
+  var addressInfo = { accounts: allAccounts };
+
+  // TODO: Fetch accounts data
+  ["XXX", "YYY", "ZZZ", "AAA", "BBB", "CCC"].map((token) =>
+    allAccounts.push({
+      fromAsset: "ADA",
+      toAsset: token,
+      period: 0,
+      nextSwap: 0,
+    })
+  );
+
+  return { addressInfo };
+};
+
 export const getAssets = async (address: string) => {
   var allNFTs: any = [];
   var addressInfo = { nfts: allNFTs, balance: 0 };
