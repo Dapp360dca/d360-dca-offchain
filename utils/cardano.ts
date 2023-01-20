@@ -1,8 +1,25 @@
+export const getAccounts = async (address: string) => {
+  var allAccounts: any = [];
+  var addressInfo = { accounts: allAccounts };
+
+  // TODO: Fetch accounts data
+  ["XXX", "YYY", "ZZZ", "AAA", "BBB", "CCC"].map((token) =>
+    allAccounts.push({
+      fromAsset: "ADA",
+      toAsset: token,
+      period: 0,
+      nextSwap: 0,
+    })
+  );
+
+  return { addressInfo };
+};
+
 export const getAssets = async (address: string) => {
   var allNFTs: any = [];
   var addressInfo = { nfts: allNFTs, balance: 0 };
   const data = await fetch(
-    `https://cardano-preview.blockfrost.io/api/v0/addresses/${address}`,
+    `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}`,
     {
       headers: {
         // Your Blockfrost API key
@@ -23,7 +40,7 @@ export const getAssets = async (address: string) => {
       //var allNFTs = []
       if (asset.unit !== "lovelace") {
         const data = await fetch(
-          `https://cardano-preview.blockfrost.io/api/v0/assets/${asset.unit}`,
+          `https://cardano-preprod.blockfrost.io/api/v0/assets/${asset.unit}`,
           {
             headers: {
               // Your Blockfrost API key

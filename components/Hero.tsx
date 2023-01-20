@@ -1,4 +1,3 @@
-import React from 'react'
 import Typewriter from 'typewriter-effect'
 import styles from '../styles/Home.module.css'
 
@@ -6,10 +5,10 @@ const Hero = () => {
   return (
     <div className="flex bg-[image:url('/bg.jpg')] bg-no-repeat bg-cover bg-center bg-fixed h-screen w-full items-center">
         <div>
-            <img className='w-[300px] absolute inset-y-5 right-0' src='/insideU.jpg' alt='Hero img' />
+            <img className='w-[300px] fixed absolute inset-y-14 right-0' src='/insideU.jpg' alt='Hero img' />
         </div>
         <div>
-            <img className='w-[150px] absolute bottom-0 right-0' src='/insideD.jpg' alt='Hero img2'/>
+            <img className='w-[150px] object-contain absolute bottom-0 right-0' src='/insideD.jpg' alt='Hero img2'/>
         </div>
     <div className='max-w-[450px] text-white flex flex-col gap-[40px] px-4'>
                 <div>
@@ -31,7 +30,7 @@ const Hero = () => {
                         "Swap DCA",
                         "Harvest DCA",
                         "Close DCA",
-                        "Refile DCA"
+                        "Refill DCA"
                     ],
                     autoStart: true,
                     loop: true

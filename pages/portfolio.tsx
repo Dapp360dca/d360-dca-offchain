@@ -4,9 +4,12 @@ import WalletConnect from "../components/WalletConnect";
 import { useStoreActions, useStoreState } from "../utils/store";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getAssets } from "../utils/cardano";
-import NftGrid from "../components/NftGrid";
+import { getAccounts } from "../utils/cardano";
+import AccountGrid from "../components/AccountGrid";
 import initLucid from "../utils/lucid";
+import Address from "../components/Address";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
 import {
   applyParamsToScript,
   Constr,
@@ -23,32 +26,24 @@ import {
 import * as helios from "@hyperionbt/helios";
 
 const Portfolio: NextPage = () => {
+  const walletStore = useStoreState((state: any) => state.wallet);
+  const [accountList, setAccountList] = useState([]);
+
+  useEffect(() => {
+    //const lucid = initLucid(walletStore.name)
+    // if (walletStore.address != "") {
+    getAccounts(walletStore.address).then((res: any) => {
+      setAccountList(res.addressInfo.accounts);
+    });
+    // }
+  }, [walletStore.address]);
+
   return (
-    <div className="px-10">
-      <div className="navbar bg-base-100">
-        <div className="flex-1">
-          <Link href="/" className="btn btn-ghost normal-case text-xl">
-            Cardano
-          </Link>
-        </div>
-        <div className="flex-none">
-          <WalletConnect />
-        </div>
-      </div>
-
-      {/* TODO: Account details component here */}
-
-      <div className="mx-40 my-10">
-        {/* Harvest button */}
-        <button className="btn m-5" onClick={() => {}}>
-          Harvest
-        </button>
-
-        {/* Close button */}
-        <button className="btn btn-primary m-5" onClick={() => {}}>
-          Close
-        </button>
-      </div>
+    <div>
+      <Header />
+      <Navbar/>
+      <Address />
+      <AccountGrid accounts={accountList} />
     </div>
   );
 };
