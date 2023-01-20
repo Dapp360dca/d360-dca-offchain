@@ -7,6 +7,9 @@ import { useState, useEffect } from "react";
 import { getAccounts } from "../utils/cardano";
 import AccountGrid from "../components/AccountGrid";
 import initLucid from "../utils/lucid";
+import Address from "../components/Address";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
 import {
   applyParamsToScript,
   Constr,
@@ -36,23 +39,11 @@ const Portfolio: NextPage = () => {
   }, [walletStore.address]);
 
   return (
-    <div className="px-10">
-      <div className="navbar bg-base-100">
-        <div className="flex-1">
-          <Link href="/" className="btn btn-ghost normal-case text-xl">
-            Cardano
-          </Link>
-        </div>
-        <div className="flex-none">
-          <WalletConnect />
-        </div>
-      </div>
-
-      <div className="mx-40 my-10">
-        <div>Your Accounts:</div>
-        <br />
-        <AccountGrid accounts={accountList} />
-      </div>
+    <div>
+      <Header />
+      <Navbar/>
+      <Address />
+      <AccountGrid accounts={accountList} />
     </div>
   );
 };

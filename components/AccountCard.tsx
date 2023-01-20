@@ -27,7 +27,7 @@ const AccountCard = (props: any) => {
   );
 
   return (
-    <div className="card w-76 bg-base-300 shadow-xl m-50">
+    <div className="card bg-[#F8F8FF] text-black shadow-xl p-0 m-6 ">
       <div className="card-body items-center text-center">
         <h2 className="card-title">{assetPair}</h2>
 

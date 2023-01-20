@@ -5,7 +5,6 @@ import { useStoreActions, useStoreState } from "../utils/store";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getAssets } from "../utils/cardano";
-import NftGrid from "../components/NftGrid";
 import initLucid from "../utils/lucid";
 import {
   applyParamsToScript,
