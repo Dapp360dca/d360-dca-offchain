@@ -21,7 +21,10 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^4.7.1",
-    "typewriter-effect": "^2.19.0"
+    "typewriter-effect": "^2.19.0",
+    "@dcspark/cardano-multiplatform-lib-browser": "^3.0.1",
+    "@dcspark/cardano-multiplatform-lib-nodejs": "^3.0.1",
+    "@wingriders/dex-serializer": "^0.1.4"
   },
   "devDependencies": {
     "@types/node": "18.7.18",
