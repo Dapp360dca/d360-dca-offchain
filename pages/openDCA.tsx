@@ -8,7 +8,6 @@ const openDCA = () => {
     <>
     <Header />
     <Navbar/>
-    <Address />
     <OpenDCA />
     </>
     )

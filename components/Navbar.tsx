@@ -14,9 +14,9 @@ const Navbar = () => {
                 <Link href='/swapDCA'><a className= 'hover:text-[#ff4D41]'>Swap DCA</a></Link>
                 <Link href='/portfolio'><a className= 'hover:text-[#ff4D41]'>Portfolio</a></Link>
             </div>
-            <a className='hidden md:flex border border-[#ff4D41] px-3 py-1 bg-[#ffffff] text-[#ff4D41] rounded-[5px] items-center gap-2 font-bold hover:bg-[#ff4D41] hover:text-white transition duration-200'>
+            <a className='hidden md:flex border border-[#ff4D41] px-2 py-2 bg-[#ffffff] text-[#ff4D41] rounded-[5px] items-center gap-2 font-bold hover:bg-[#ff4D41] hover:text-white transition duration-200'>
                 <WalletConnect />
-            </a>
+            </a> 
             <div className='md:hidden text-[24px]'>
                 <FiMenu />
             </div>

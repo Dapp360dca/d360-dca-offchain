@@ -42,7 +42,6 @@ const Portfolio: NextPage = () => {
     <div>
       <Header />
       <Navbar/>
-      <Address />
       <AccountGrid accounts={accountList} />
     </div>
   );
