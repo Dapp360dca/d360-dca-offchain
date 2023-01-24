@@ -12,6 +12,7 @@ const WalletConnect = () => {
     const setAvailableWallets = useStoreActions(actions => actions.setAvailableWallets)
     
     const [connectedAddress, setConnectedAddress] = useState("")
+
     
     const loadWalletSession = async () => {
         if (walletStore.connected &&
@@ -30,6 +31,10 @@ const WalletConnect = () => {
         setConnectedAddress(addr)
         setWallet(walletStoreObj)
     }
+    
+    const clearState = () => {
+        setConnectedAddress("")
+      }
 
     const selectWallet = async (wallet: string) => {
         if (
@@ -58,32 +63,6 @@ const WalletConnect = () => {
       }
     }, [walletStore.address]);
 
-    const disconnectWallet = async (wallet: string) => {
-        let walletIsEnabled = false;
-        if (
-            window.cardano &&
-           await window.cardano[wallet].isEnabled()
-        ) {
-            console.log("wallet is connected")
-        } else {console.log("Disconnected")
-}
-    }
- disconnectWallet(walletStore.name)
-
- const checkIfWalletEnabled = async () => {
-    let walletIsEnabled = false;
-
-    try {
-        const walletName = walletStore.name;
-        walletIsEnabled = await window.cardano[walletName].isEnabled();
-
-    } catch (err) {
-        console.log(err)
-    }
-    this.setState({walletIsEnabled});
-
-    return walletIsEnabled;
-}
 
     return (
         <>
@@ -93,7 +72,12 @@ const WalletConnect = () => {
                 <>
                 <div className='w-[150px]'><span className='truncate block'>${walletStore.address}</span></div> 
                 <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-100">
-                    <li onClick={() => {}}><a>{walletStore.address} DISCONNECT</a></li>
+                    <li onClick={() => {}}>
+                        <div className='menu p-2 h-[100] w-[100]'>
+                            <li><a className='text-white'>{walletStore.address}</a></li>
+                            <div onClick={clearState} className='bg-white text-[#ff4D41] rounded-[5px] px-2 py-2 hover:text-black'><a>DISCONNECT</a></div>
+                        </div>
+                    </li>
                 </ul>
                 </>
                 :

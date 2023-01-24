@@ -162,7 +162,7 @@ const Offchain: NextPage = () => {
   ): Promise<TxHash> {
 
     //const utxos = await lucid?.utxosByOutRef([outRef]);
-    const dcaScriptAddress: Address = lucid.utils.validatorToAddress(
+    const !dcaScriptAddress: Address = lucid.utils.validatorToAddress(
       dcaScript,
     );
     const utxos = (await lucid.utxosAt(dcaScriptAddress)).filter(
@@ -173,7 +173,7 @@ const Offchain: NextPage = () => {
       .collectFrom(utxos!, Data.empty())
       .complete();
   
-    const signedTx = await tx.sign().complete();
+    const signedTx = await tx.sign().complete()
     const txHash = await signedTx.submit();
   
     return txHash;
