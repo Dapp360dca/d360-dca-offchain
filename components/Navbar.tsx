@@ -10,6 +10,7 @@ const Navbar = () => {
             <div className='hidden md:flex gap-6'>
                 <Link href='/'><a className= 'hover:text-[#ff4D41]'>Home</a></Link>
                 <Link href='/aboutUs'><a className= 'hover:text-[#ff4D41]'>About us</a></Link>
+                <Link href='/offchain'><a className= 'hover:text-[#ff4D41]'>Offchain</a></Link>
                 <Link href='/openDCA'><a className= 'hover:text-[#ff4D41]'>Open DCA</a></Link>
                 <Link href='/swapDCA'><a className= 'hover:text-[#ff4D41]'>Swap DCA</a></Link>
                 <Link href='/portfolio'><a className= 'hover:text-[#ff4D41]'>Portfolio</a></Link>
