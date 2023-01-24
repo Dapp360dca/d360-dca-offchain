@@ -1,9 +1,9 @@
-import { Data } from "lucid-cardano";
+import { Constr, Data, hexToUtf8 } from "lucid-cardano";
 
 export const dcaScAddress =
   "addr_test1wr6echczsvcn7lvxu0nsf70egvzgrt8e3kk8gd055u9lp4c7vw032";
 
-export const getAccounts = async (address: string) => {
+export const getAccounts = async (pkh: string) => {
   var allAccounts: any = [];
   var addressInfo = { accounts: allAccounts };
 
@@ -22,79 +22,57 @@ export const getAccounts = async (address: string) => {
     // Handle error.
     console.log("error");
   } else {
-    data
-      .filter((utxo: any) => Boolean(utxo["inline_datum"]))
-      .map((utxo: any) => {
-        console.log(utxo);
-        const datum = Data.from(utxo["inline_datum"]);
-        console.log(datum);
-        allAccounts.push({
-          fromAsset: "ADA",
-          toAsset: "XXX",
-          period: 0,
-          nextSwap: 0,
-          amount: utxo["amount"][0]["quantity"],
-        });
-      });
-  }
+    // console.log(pkh);
+    await Promise.all(
+      data
+        .filter((utxo: any) => {
+          try {
+            const datum = Data.from(utxo["inline_datum"]) as Constr<any>;
+            return (
+              !utxo.scriptRef && pkh === datum.fields[0].fields[0].fields[0]
+            );
+          } catch {
+            return false;
+          }
+        })
+        .map(async (utxo: any) => {
+          console.log(utxo);
+          const datum = Data.from(utxo["inline_datum"]) as Constr<any>;
+          console.log(datum);
 
-  // https://cardano-preprod.blockfrost.io/api/v0/addresses/{address}/utxos
-  // ["XXX", "YYY", "ZZZ", "AAA", "BBB", "CCC"].map((token) =>
-  //   allAccounts.push({
-  //     fromAsset: "ADA",
-  //     toAsset: token,
-  //     period: 0,
-  //     nextSwap: 0,
-  //   })
-  // );
+          const fromAsset = `t${await getAsset(datum.fields[1])}`;
+          const toAsset = `t${await getAsset(datum.fields[2])}`;
+
+          allAccounts.push({
+            fromAsset: fromAsset,
+            toAsset: toAsset,
+            period: 0,
+            nextSwap: 0,
+            amount: utxo["amount"][0]["quantity"],
+          });
+        })
+    );
+  }
 
   return { addressInfo };
 };
 
-// export const getAssets = async (address: string) => {
-//   var allNFTs: any = [];
-//   var addressInfo = { nfts: allNFTs, balance: 0 };
-//   const data = await fetch(
-//     `https://cardano-preprod.blockfrost.io/api/v0/addresses/${address}`,
-//     {
-//       headers: {
-//         // Your Blockfrost API key
-//         project_id: process.env.NEXT_PUBLIC_BLOCKFROST!,
-//         "Content-Type": "application/json",
-//       },
-//     }
-//   ).then((res) => res.json());
-//   // console.log(data);
-//   if (data?.error) {
-//     // Handle error.
-//     console.log("error");
-//   }
+const getAsset = async (datumField: Constr<any>) => {
+  var asset = datumField.fields[0];
+  return "" === asset ? "ADA" : await getAssetName(asset);
+};
 
-//   const amount = data["amount"];
-//   if (amount.length > 0) {
-//     amount.map(async (asset: any) => {
-//       //var allNFTs = []
-//       if (asset.unit !== "lovelace") {
-//         const data = await fetch(
-//           `https://cardano-preprod.blockfrost.io/api/v0/assets/${asset.unit}`,
-//           {
-//             headers: {
-//               // Your Blockfrost API key
-//               project_id: process.env.NEXT_PUBLIC_BLOCKFROST!,
-//               "Content-Type": "application/json",
-//             },
-//           }
-//         ).then((res) => res.json());
-//         const meta = data["onchain_metadata"];
-//         if (meta && meta.image) {
-//           allNFTs.push({ ...meta, assetId: data.asset });
-//         } else {
-//           //   console.log("nometa", data)
-//         }
-//       } else if (asset.unit === "lovelace") {
-//         addressInfo.balance === asset.quantity;
-//       }
-//     });
-//   }
-//   return { addressInfo };
-// };
+const getAssetName = async (asset: string) => {
+  const data = await fetch(
+    `https://cardano-preprod.blockfrost.io/api/v0/assets/${asset}`,
+    {
+      headers: {
+        // Your Blockfrost API key
+        project_id: process.env.NEXT_PUBLIC_BLOCKFROST!,
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((res) => res.json());
+  console.log(hexToUtf8(data["asset_name"]));
+  return `${hexToUtf8(data["asset_name"])}`;
+};

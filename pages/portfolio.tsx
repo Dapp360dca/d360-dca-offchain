@@ -28,53 +28,23 @@ import { dcaScript } from "./offchain";
 
 const Portfolio: NextPage = () => {
   const walletStore = useStoreState((state: any) => state.wallet);
-  const [lucid, setLucid] = useState<Lucid>();
   const [accountList, setAccountList] = useState([]);
 
   useEffect(() => {
-    // const lucid = initLucid(walletStore.name);
-    //   if (walletStore.address != "") {
-    getAccounts(walletStore.address).then((res: any) => {
-      setAccountList(res.addressInfo.accounts);
+    initLucid(walletStore.name).then((lucid) => {
+      const { paymentCredential } = lucid.utils.getAddressDetails(
+        walletStore.address
+      );
+
+      if (paymentCredential) {
+        getAccounts(paymentCredential.hash).then((res: any) => {
+          setAccountList(res.addressInfo.accounts);
+        });
+      } else {
+        console.log("Failed retrieving wallet PKH");
+      }
     });
-    /////////////////////////////////////////////
-    // {
-    //   accounts: [
-    //     {
-    //       owner: "PlutusV2.Address",
-    //       fromAsset: "PlutusV2.AssetClass",
-    //       toAsset: "PlutusV2.AssetClass",
-    //       ammount: "Integer",
-    //       nextSwap: "PlutusV2.POSIXTime",
-    //       period: "Integer",
-    //     },
-    //   ];
-    // }
-    // }
   }, [walletStore.address]);
-
-  // useEffect(() => {
-  //   if (lucid) {
-  //     loadAccounts();
-  //   } else {
-  //     initLucid(walletStore.name).then((Lucid: Lucid) => {
-  //       setLucid(Lucid);
-  //     });
-  //   }
-  // }, [lucid]);
-
-  // const loadAccounts = async () => {
-  //   if (lucid) {
-  //     const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
-  //     console.log(dcaScriptAddress);
-  //     // const ownerAddress = await lucid.wallet.address();
-
-  //     // const dcaUtxos = await lucid.utxosAt(dcaScriptAddress);
-  //     // const ownedUtxos = dcaUtxos.filter(
-  //     //   (utxo) => !utxo.scriptRef
-  //     // );
-  //   }
-  // };
 
   return (
     <div>
