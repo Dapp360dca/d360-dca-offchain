@@ -36,19 +36,26 @@ export const getAccounts = async (pkh: string) => {
           }
         })
         .map(async (utxo: any) => {
-          console.log(utxo);
+          // console.log(utxo);
           const datum = Data.from(utxo["inline_datum"]) as Constr<any>;
-          console.log(datum);
+          // console.log(datum);
 
           const fromAsset = `t${await getAsset(datum.fields[1])}`;
           const toAsset = `t${await getAsset(datum.fields[2])}`;
+          const dcaAmount = `${datum.fields[3]}`;
+          const nextSwap = `${datum.fields[4].fields[0]}`;
+          const period = `${datum.fields[5]}`;
 
           allAccounts.push({
             fromAsset: fromAsset,
             toAsset: toAsset,
-            period: 0,
-            nextSwap: 0,
-            amount: utxo["amount"][0]["quantity"],
+            dcaAmount: dcaAmount,
+            period: period,
+            nextSwap: nextSwap,
+            fromAmount: 0, // utxo["amount"][0]["quantity"],
+            toAmount: 0,
+            txHash: utxo["tx_hash"],
+            txIdx: utxo["tx_index"],
           });
         })
     );
@@ -73,6 +80,6 @@ const getAssetName = async (asset: string) => {
       },
     }
   ).then((res) => res.json());
-  console.log(hexToUtf8(data["asset_name"]));
+  // console.log(hexToUtf8(data["asset_name"]));
   return `${hexToUtf8(data["asset_name"])}`;
 };
