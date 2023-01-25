@@ -1,7 +1,3 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { useStoreActions, useStoreState } from "../utils/store";
-
 const AccountCard = (props: any) => {
   // useEffect(() => console.log(props), [props]);
 
