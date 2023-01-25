@@ -52,7 +52,7 @@ export const getAccounts = async (pkh: string) => {
             dcaAmount: dcaAmount,
             period: period,
             nextSwap: nextSwap,
-            fromAmount: 0, // utxo["amount"][0]["quantity"],
+            fromAmount: utxo["amount"][0]["quantity"],
             toAmount: 0,
             txHash: utxo["tx_hash"],
             txIdx: utxo["tx_index"],

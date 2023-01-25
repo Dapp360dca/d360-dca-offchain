@@ -1,28 +1,15 @@
 import type { NextPage } from "next";
+
 import Head from "next/head";
 import { useStoreActions, useStoreState } from "../utils/store";
 import Link from "next/link";
+
 import { useState, useEffect } from "react";
 import { getAccounts } from "../utils/cardano";
 import AccountGrid from "../components/AccountGrid";
 import initLucid from "../utils/lucid";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
-import {
-  applyParamsToScript,
-  Constr,
-  Data,
-  Lovelace,
-  Lucid,
-  MintingPolicy,
-  PolicyId,
-  SpendingValidator,
-  TxHash,
-  Unit,
-  utf8ToHex,
-} from "lucid-cardano";
-import * as helios from "@hyperionbt/helios";
-import { dcaScript } from "./offchain";
 
 const Portfolio: NextPage = () => {
   const walletStore = useStoreState((state: any) => state.wallet);

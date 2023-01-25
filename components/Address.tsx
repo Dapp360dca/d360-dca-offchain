@@ -1,15 +1,7 @@
- import { getAccounts } from "../utils/cardano";
 import { useStoreState } from "../utils/store";
-import { useState, useEffect } from "react";
 
 const Address = () => {
   const walletStore = useStoreState((state: any) => state.wallet);
-  useEffect(() => {
-    if (walletStore.address != "") {
-      getAccounts(walletStore.address).then((res: any) => {
-      });
-    }
-  }, [walletStore.address]);
 
   return (
     <div className="fixed top-14">

@@ -1,17 +1,8 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { useStoreActions, useStoreState } from "../utils/store";
-
 const AccountCard = (props: any) => {
-  // useEffect(() => console.log(props), [props]);
-
   // Card title
   const assetPair = `${props.meta.fromAsset} - ${props.meta.toAsset}`;
 
   // Card details
-  // const currentAssetFrom = `Current ${props.meta.fromAsset}: ${props.meta.fromAmount}`;
-  // const currentAssetTo = `Current ${props.meta.toAsset}: ${props.meta.toAmount}`;
-
   const dcaAmount = `${Math.floor(
     props.meta.fromAsset.endsWith("ADA")
       ? props.meta.dcaAmount / 1000000
@@ -32,7 +23,7 @@ const AccountCard = (props: any) => {
     <table>
       <tr style={{ backgroundColor: "#EEEEEE" }}>
         <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
-        <td valign="top">{props.meta.fromAmount}</td>
+        <td valign="top">{props.meta.fromAmount / 1000000}</td>
       </tr>
       <tr>
         <td valign="top">{`Current ${props.meta.toAsset}`}</td>
