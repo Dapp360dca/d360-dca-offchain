@@ -1,19 +1,7 @@
-// import { getAssets } from "../utils/cardano";
 import { useStoreState } from "../utils/store";
-// import { useState, useEffect } from "react";
 
 const Address = () => {
   const walletStore = useStoreState((state: any) => state.wallet);
-  // const [nftList, setNftList] = useState([]);
-
-  // useEffect(() => {
-  //   //const lucid = initLucid(walletStore.name)
-  //   if (walletStore.address != "") {
-  //     getAssets(walletStore.address).then((res: any) => {
-  //       setNftList(res.addressInfo.nfts);
-  //     });
-  //   }
-  // }, [walletStore.address]);
 
   return (
     <div className="fixed top-14">
