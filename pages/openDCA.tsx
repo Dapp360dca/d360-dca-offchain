@@ -1,14 +1,15 @@
 import OpenDCA from '../components/OpenDCA'
 import Navbar from '../components/Navbar'
-import Address from '../components/Address'
 import Header from '../components/Header'
+import type { NextPage } from "next";
+import WalletConnect  from '../components/WalletConnect';
 
-const openDCA = () => {
+const openDCA : NextPage = () => {
   return (
     <>
     <Header />
     <Navbar/>
-    <Address />
+    <WalletConnect />
     <OpenDCA />
     </>
     )

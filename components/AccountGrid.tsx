@@ -1,5 +1,5 @@
 import AccountCard from "./AccountCard";
-import loading from "../public/loading.svg";
+//import loading from "../public/loading.svg";
 
 const AccountGrid = (props: any) => {
   return (
@@ -9,13 +9,13 @@ const AccountGrid = (props: any) => {
           Open Positions
         </div>
         <div className="grid gap-x-0 gap-y-0 grid-cols-3">
-          {props.accounts.length > 0 ? (
+          {/* {props.accounts.length > 0 ? (
             props.accounts.map((account: any, index: Number) => (
               <AccountCard key={index} meta={account} />
             ))
           ) : (
             <img src={loading} className="loading" alt="loading" />
-          )}
+          )} */}
         </div>
       </div>
     </div>

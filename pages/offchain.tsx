@@ -43,15 +43,6 @@ const Offchain: NextPage = () => {
   const [script, setScript] = useState<SpendingValidator>();
   const [scriptAddress, setScriptAddress] = useState("");
 
-  useEffect(() => {
-    if (lucid) {
-    } else {
-      initLucid(walletStore.name).then((Lucid: Lucid) => {
-        setLucid(Lucid);
-      });
-    }
-  }, [lucid]);
-
   // helper functions
 
   function keyAddressWithKeyStakeToData(address: Address): PlutusData {

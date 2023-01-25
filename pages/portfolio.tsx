@@ -1,10 +1,13 @@
 import type { NextPage } from "next";
-import { useStoreState } from "../utils/store";
+
+import Head from "next/head";
+import { useStoreActions, useStoreState } from "../utils/store";
+import Link from "next/link";
+
 import { useState, useEffect } from "react";
 import { getAccounts } from "../utils/cardano";
 import AccountGrid from "../components/AccountGrid";
 import initLucid from "../utils/lucid";
-import Address from "../components/Address";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 
@@ -31,8 +34,7 @@ const Portfolio: NextPage = () => {
   return (
     <div>
       <Header />
-      <Navbar />
-      <Address />
+      <Navbar/>
       <AccountGrid accounts={accountList} />
     </div>
   );

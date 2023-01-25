@@ -222,4 +222,4 @@ const OpenDCA = () => {
   );
 };
 
-export default OpenDCA;
+export default OpenDCA

@@ -16,3 +16,4 @@ const initLucid = async (wallet: string) => {
 };
 
 export default initLucid;
+

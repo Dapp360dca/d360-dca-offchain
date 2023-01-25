@@ -4,7 +4,6 @@ import WalletConnect from "../components/WalletConnect";
 import { useStoreActions, useStoreState } from "../utils/store";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getAssets } from "../utils/cardano";
 import initLucid from "../utils/lucid";
 import {
   applyParamsToScript,
@@ -155,7 +154,6 @@ const Helios: NextPage = () => {
       // to be read from
       const scriptAddress = lucid.utils.validatorToAddress(alwaysSucceedScript);
       const utxos = await lucid.utxosAt(scriptAddress);
-      // .utxosAtWithUnit to search for NFTs
       if (!utxos) throw "No UTxO to read from!";
 
       // refTxHash: see setState() above
@@ -167,9 +165,8 @@ const Helios: NextPage = () => {
         .newTx()
         .collectFrom([collectUtxos[0]]) // no redeemer
         .readFrom([txIn])
-        .addSignerKey(paymentCredential?.hash!) // important! or .addSigner(addr)
+        .addSignerKey(paymentCredential?.hash!)
         .validFrom(Date.now())
-        // and then .payToContract to include the NFT to the tx
         .complete();
 
       const signedTx = await tx.sign().complete();
