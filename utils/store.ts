@@ -23,6 +23,8 @@ const model: StoreModel = {
 const store = createStore(persist(model))
 export default store
 
+const clear = store.persist.clear()
+
 
 const { useStoreActions, useStoreState, useStoreDispatch, useStore } = createTypedHooks<StoreModel>()
 

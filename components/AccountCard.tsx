@@ -3,27 +3,54 @@ import { useState } from "react";
 import { useStoreActions, useStoreState } from "../utils/store";
 
 const AccountCard = (props: any) => {
-  useEffect(() => console.log(props), [props]);
+  // useEffect(() => console.log(props), [props]);
 
   // Card title
   const assetPair = `${props.meta.fromAsset} - ${props.meta.toAsset}`;
 
   // Card details
-  const currentAssetFrom = `Current ${props.meta.fromAsset}: 100`;
-  const currentAssetTo = `Current ${props.meta.toAsset}: 0`;
-  const period = `Period: ${props.meta.period}`;
-  const nextSwap = `Next swap: ${props.meta.nextSwap}`;
+  // const currentAssetFrom = `Current ${props.meta.fromAsset}: ${props.meta.fromAmount}`;
+  // const currentAssetTo = `Current ${props.meta.toAsset}: ${props.meta.toAmount}`;
+
+  const dcaAmount = `${Math.floor(
+    props.meta.fromAsset.endsWith("ADA")
+      ? props.meta.dcaAmount / 1000000
+      : props.meta.dcaAmount
+  )} ${props.meta.fromAsset}`;
+
+  const s = props.meta.period / 1000;
+  const m = s / 60;
+  const h = m / 60;
+  const d = h / 24;
+  const sec = Math.floor(s) % 60 === 0 ? "" : ` ${s} sec`;
+  const min = Math.floor(m) % 60 === 0 ? "" : ` ${m} min`;
+  const hr = Math.floor(h) % 24 === 0 ? "" : ` ${h} hour(s)`;
+  const day = Math.floor(d) === 0 ? "" : ` ${d} days`;
+  // const period = `Period:${day}${hr}${min}${sec}`;
+  // const nextSwap = `Next swap: ${new Date(parseInt(props.meta.nextSwap))}`;
   const cardDetails = (
-    <>
-      {currentAssetFrom}
-      <br />
-      {currentAssetTo}
-      <br />
-      {period}
-      <br />
-      {nextSwap}
-      <br />
-    </>
+    <table>
+      <tr style={{ backgroundColor: "#EEEEEE" }}>
+        <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
+        <td valign="top">{props.meta.fromAmount}</td>
+      </tr>
+      <tr>
+        <td valign="top">{`Current ${props.meta.toAsset}`}</td>
+        <td valign="top">{props.meta.toAmount}</td>
+      </tr>
+      <tr style={{ backgroundColor: "#EEEEEE" }}>
+        <td valign="top">{"DCA amount"}</td>
+        <td valign="top">{dcaAmount}</td>
+      </tr>
+      <tr>
+        <td valign="top">{"Period"}</td>
+        <td valign="top">{`${day}${hr}${min}${sec}`}</td>
+      </tr>
+      <tr style={{ backgroundColor: "#EEEEEE" }}>
+        <td valign="top">{"Next swap"}</td>
+        <td valign="top">{`${new Date(parseInt(props.meta.nextSwap))}`}</td>
+      </tr>
+    </table>
   );
 
   return (
@@ -34,11 +61,21 @@ const AccountCard = (props: any) => {
         <div className="card-detail">{cardDetails}</div>
 
         <div className="card-actions">
-          <button className="btn m-50" onClick={() => {}}>
+          <button
+            className="btn m-50"
+            onClick={() => {
+              console.log(`Harvest:${props.meta.txHash}#${props.meta.txIdx}`);
+            }}
+          >
             Harvest
           </button>
 
-          <button className="btn btn-primary m-50" onClick={() => {}}>
+          <button
+            className="btn btn-primary m-50"
+            onClick={() => {
+              console.log(`Close:${props.meta.txHash}#${props.meta.txIdx}`);
+            }}
+          >
             Close
           </button>
         </div>

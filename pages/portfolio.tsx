@@ -1,13 +1,11 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import WalletConnect from "../components/WalletConnect";
 import { useStoreActions, useStoreState } from "../utils/store";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getAccounts } from "../utils/cardano";
 import AccountGrid from "../components/AccountGrid";
 import initLucid from "../utils/lucid";
-import Address from "../components/Address";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import {
@@ -24,18 +22,26 @@ import {
   utf8ToHex,
 } from "lucid-cardano";
 import * as helios from "@hyperionbt/helios";
+import { dcaScript } from "./offchain";
 
 const Portfolio: NextPage = () => {
   const walletStore = useStoreState((state: any) => state.wallet);
   const [accountList, setAccountList] = useState([]);
 
   useEffect(() => {
-    //const lucid = initLucid(walletStore.name)
-    // if (walletStore.address != "") {
-    getAccounts(walletStore.address).then((res: any) => {
-      setAccountList(res.addressInfo.accounts);
+    initLucid(walletStore.name).then((lucid) => {
+      const { paymentCredential } = lucid.utils.getAddressDetails(
+        walletStore.address
+      );
+
+      if (paymentCredential) {
+        getAccounts(paymentCredential.hash).then((res: any) => {
+          setAccountList(res.addressInfo.accounts);
+        });
+      } else {
+        console.log("Failed retrieving wallet PKH");
+      }
     });
-    // }
   }, [walletStore.address]);
 
   return (

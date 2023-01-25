@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useStoreActions, useStoreState } from "../utils/store";
 import initLucid from "../utils/lucid";
-import { getAssets } from "../utils/cardano";
+import { getAccounts } from "../utils/cardano";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+
 
 
 const WalletConnect = () => {
     // const [availableWallets, setAvailableWallets] = useState<string[]>([])
-    const walletStore = useStoreState(state => state.wallet)
+    const walletStore = useStoreState(state => state.wallet) 
     const setWallet = useStoreActions(actions => actions.setWallet)
     const availableWallets = useStoreState(state => state.availableWallets)
     const setAvailableWallets = useStoreActions(actions => actions.setAvailableWallets)
+    const clearStore = useStoreState(state => state.wallet)
     
     const [connectedAddress, setConnectedAddress] = useState("")
+
+    const [copied, setCopied] = useState(false)
 
     
     const loadWalletSession = async () => {
@@ -32,9 +37,12 @@ const WalletConnect = () => {
         setWallet(walletStoreObj)
     }
     
-    const clearState = () => {
-        setConnectedAddress("")
-      }
+    const disconnectWallet = async (wallet: string, connect: boolean = false) => {
+        const addr = connect ? await (await initLucid(wallet)).wallet.address() : ''
+        const walletStoreObj = connect ? { connected: true, name: wallet, address: addr } : { connected: false, name: '', address: '' }
+        setConnectedAddress(addr)
+        setWallet(walletStoreObj)
+    }
 
     const selectWallet = async (wallet: string) => {
         if (
@@ -56,12 +64,17 @@ const WalletConnect = () => {
         setAvailableWallets(wallets)
     }, [])
   
-  
     useEffect(() => {
       if (walletStore.address != "") {
-        getAssets(walletStore.address)
+        getAccounts(walletStore.address)
       }
     }, [walletStore.address]);
+
+    
+    const clearState = async () => {
+        if (walletStore.connected)   
+            {disconnectWallet(walletStore.name)}
+    }
 
 
     return (
@@ -74,8 +87,16 @@ const WalletConnect = () => {
                 <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-300 rounded-box w-100">
                     <li onClick={() => {}}>
                         <div className='menu p-2 h-[100] w-[100]'>
-                            <li><a className='text-white'>{walletStore.address}</a></li>
-                            <div onClick={clearState} className='bg-white text-[#ff4D41] rounded-[5px] px-2 py-2 hover:text-black'><a>DISCONNECT</a></div>
+                            <li>
+                            <a className='text-white'>{walletStore.address}</a>
+                            <CopyToClipboard text={walletStore.address}>
+                            <span onClick={() => {setCopied(true)}} data-tooltip-target="tooltip-top" className="flex flex-col justify-center items-center">
+                                <div className='bg-white text-[#021639] rounded-[5px] px-2 py-2 hover:text-[#ff4D41]'>copy address</div>
+                            </span>
+                            </CopyToClipboard>
+                                {copied ? <span data-tooltip-target="tooltip-top"></span>: null}
+                            </li>
+                            <div onClick={() => {clearState()}} className='bg-white text-[#ff4D41] rounded-[5px] px-2 py-2 hover:text-[#021639]'><a>DISCONNECT</a></div>
                         </div>
                     </li>
                 </ul>
