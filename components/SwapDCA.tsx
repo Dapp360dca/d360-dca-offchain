@@ -11,17 +11,9 @@ const SwapDCA = () => {
   useEffect(() => {
     if (walletStore.connected) {
       initLucid(walletStore.name).then((lucid) => {
-        const { paymentCredential } = lucid.utils.getAddressDetails(
-          walletStore.address
-        );
-
-        if (paymentCredential) {
-          getAccounts(paymentCredential.hash).then((res: any) => {
-            setAccountList(res.addressInfo.accounts);
-          });
-        } else {
-          console.log("Failed retrieving wallet PKH");
-        }
+        getAccounts(lucid).then((res: any) => {
+          setAccountList(res.addressInfo.accounts);
+        });
       });
     }
   }, [walletStore.address]);
