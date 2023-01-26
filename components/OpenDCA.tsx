@@ -10,7 +10,7 @@ const OpenDCA = () => {
   const [txHash, setTxHash] = useState<string>();
 
   useEffect(() => {
-    if (!lucid) {
+    if (walletStore.connected && !lucid) {
       initLucid(walletStore.name).then((Lucid: Lucid) => {
         setLucid(Lucid);
       });
@@ -132,7 +132,7 @@ const OpenDCA = () => {
                     }}
                     required
                   >
-                    <option value="47e9faf04ae9f5c3bcde980c84e332b84feebc9fa2870cff07239bbe575254">
+                    <option value="f6f49b186751e61f1fb8c64e7504e771f968cea9f4d11f5222b169e374575254">
                       tWRT
                     </option>
                   </select>
@@ -222,4 +222,4 @@ const OpenDCA = () => {
   );
 };
 
-export default OpenDCA
+export default OpenDCA;
