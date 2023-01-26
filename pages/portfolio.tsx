@@ -19,7 +19,7 @@ const Portfolio: NextPage = () => {
         );
 
         if (paymentCredential) {
-          getAccounts(paymentCredential.hash).then((res: any) => {
+          getAccounts(lucid, paymentCredential.hash).then((res: any) => {
             setAccountList(res.addressInfo.accounts);
           });
         } else {
