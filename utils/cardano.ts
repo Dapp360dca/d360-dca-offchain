@@ -28,10 +28,9 @@ export const getAccounts = async (pkh: string) => {
         .filter((utxo: any) => {
           try {
             const datum = Data.from(utxo["inline_datum"]) as Constr<any>;
-            return true;
-            // (
-            //   !utxo.scriptRef && pkh === datum.fields[0].fields[0].fields[0]
-            // );
+            return (
+              !utxo.scriptRef && pkh === datum.fields[0].fields[0].fields[0]
+            );
           } catch {
             return false;
           }
@@ -40,11 +39,12 @@ export const getAccounts = async (pkh: string) => {
           try {
             // console.log(utxo);
             const datum = Data.from(utxo["inline_datum"]) as Constr<any>;
-            console.log(datum);
+            // console.log(datum);
 
-            const stakeKey =
+            const datumAddress = datum.fields[0].fields[0];
+            const datumPKH = datum.fields[0].fields[0].fields[0];
+            const datumStakeKey =
               datum.fields[0].fields[1].fields[0].fields[0].fields[0];
-            console.log(stakeKey);
             const fromAsset = await getAsset(datum.fields[1]);
             const toAsset = await getAsset(datum.fields[2]);
             const dcaAmount = `${datum.fields[3]}`;
@@ -52,8 +52,9 @@ export const getAccounts = async (pkh: string) => {
             const period = `${datum.fields[5]}`;
 
             allAccounts.push({
-              pkh: pkh,
-              stakeKey: stakeKey,
+              address: datumAddress,
+              pkh: datumPKH,
+              stakeKey: datumStakeKey,
               fromAsset: fromAsset,
               toAsset: toAsset,
               dcaAmount: dcaAmount,
