@@ -17,5 +17,3 @@ console.log(props)
 
     )
 }
-
-export default NftGrid;
