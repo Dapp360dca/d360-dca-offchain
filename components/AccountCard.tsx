@@ -1,4 +1,4 @@
-import { Address, Constr, Data, Lucid } from "lucid-cardano";
+import { Constr, Data, Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
 import { dcaScript } from "../pages/offchain";
 import initLucid from "../utils/lucid";
@@ -13,7 +13,6 @@ import {
 import mlb from "@dcspark/cardano-multiplatform-lib-browser";
 
 const AccountCard = (props: any) => {
-  /*********************************************** Endpoints ***********************************************/
   const walletStore = useStoreState((state: any) => state.wallet);
   const [lucid, setLucid] = useState<Lucid>();
   const [txHash, setTxHash] = useState<string>();
@@ -26,15 +25,7 @@ const AccountCard = (props: any) => {
     }
   }, [lucid]);
 
-  // const keyAddressWithKeyStakeToData = (address: Address) => {
-  //   const { paymentCredential, stakeCredential } =
-  //     lucid!.utils.getAddressDetails(address);
-  //   return new Constr(0, [
-  //     new Constr(0, [paymentCredential?.hash!]),
-  //     new Constr(0, [new Constr(0, [new Constr(0, [stakeCredential?.hash!])])]),
-  //   ]);
-  // };
-
+  /*********************************************** Endpoints ***********************************************/
   const swapDCA = async () => {
     if (lucid) {
       const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
@@ -68,8 +59,8 @@ const AccountCard = (props: any) => {
         mlb.BigInt.from_str(txExpiry.toString()), // Deadline - usually 24 hrs -> Date.now() + 86_400_000
         AssetClass.from_hex("", ""),
         AssetClass.from_hex(
-          "659ab0b5658687c2e74cd10dba8244015b713bf503b90557769d77a7",
-          "57696e67526964657273"
+          "f6f49b186751e61f1fb8c64e7504e771f968cea9f4d11f5222b169e3",
+          "74575254"
         ) // tWRT on Preprod
       );
       const swapAction = new SwapAction(
@@ -143,26 +134,28 @@ const AccountCard = (props: any) => {
   // const nextSwap = `Next swap: ${new Date(parseInt(props.meta.nextSwap))}`;
   const cardDetails = (
     <table>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
-        <td valign="top">{props.meta.fromAmount / 1000000}</td>
-      </tr>
-      <tr>
-        <td valign="top">{`Current ${props.meta.toAsset}`}</td>
-        <td valign="top">{props.meta.toAmount}</td>
-      </tr>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{"DCA amount"}</td>
-        <td valign="top">{dcaAmount}</td>
-      </tr>
-      <tr>
-        <td valign="top">{"Period"}</td>
-        <td valign="top">{`${day}${hr}${min}${sec}`}</td>
-      </tr>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{"Next swap"}</td>
-        <td valign="top">{`${new Date(parseInt(props.meta.nextSwap))}`}</td>
-      </tr>
+      <tbody>
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
+          <td>{props.meta.fromAmount / 1000000}</td>
+        </tr>
+        <tr>
+          <td valign="top">{`Current ${props.meta.toAsset}`}</td>
+          <td>{props.meta.toAmount}</td>
+        </tr>
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{"DCA amount"}</td>
+          <td>{dcaAmount}</td>
+        </tr>
+        <tr>
+          <td valign="top">{"Swap frequency"}</td>
+          <td>{`${day}${hr}${min}${sec}`}</td>
+        </tr>
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{"Next swap"}</td>
+          <td>{`${new Date(parseInt(props.meta.nextSwap))}`}</td>
+        </tr>
+      </tbody>
     </table>
   );
 

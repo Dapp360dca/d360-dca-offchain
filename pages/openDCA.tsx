@@ -1,18 +1,18 @@
-import OpenDCA from '../components/OpenDCA'
-import Navbar from '../components/Navbar'
-import Header from '../components/Header'
+import OpenDCA from "../components/OpenDCA";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
 import type { NextPage } from "next";
-import WalletConnect  from '../components/WalletConnect';
+import WalletConnect from "../components/WalletConnect";
 
-const openDCA : NextPage = () => {
+const openDCA: NextPage = () => {
   return (
-    <>
-    <Header />
-    <Navbar/>
-    <WalletConnect />
-    <OpenDCA />
-    </>
-    )
-}
+    <div>
+      <Header />
+      <Navbar />
+      <WalletConnect />
+      <OpenDCA />
+    </div>
+  );
+};
 
-export default openDCA
+export default openDCA;
