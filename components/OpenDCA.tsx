@@ -1,6 +1,5 @@
-import { Address, Constr, Data, Lucid } from "lucid-cardano";
+import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
-import { dcaScript } from "../pages/offchain";
 import { openDCA } from "../utils/endpoints";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
