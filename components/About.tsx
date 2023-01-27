@@ -25,7 +25,7 @@ const About = () => {
     const data = await fetch(`https://api.github.com/users/${username}`).then(
       (res) => res.json()
     );
-    console.log(data);
+    // console.log(data);
     return data;
   };
 
