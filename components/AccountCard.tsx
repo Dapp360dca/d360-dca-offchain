@@ -1,4 +1,52 @@
+import { Lucid } from "lucid-cardano";
+import { useEffect, useState } from "react";
+import initLucid from "../utils/lucid";
+import { useStoreState } from "../utils/store";
+import { swapDCA } from "../utils/endpoints";
+
 const AccountCard = (props: any) => {
+  const walletStore = useStoreState((state: any) => state.wallet);
+  const [lucid, setLucid] = useState<Lucid>();
+  const [txHash, setTxHash] = useState<string>();
+
+  useEffect(() => {
+    if (walletStore.connected && !lucid) {
+      initLucid(walletStore.name).then((Lucid: Lucid) => {
+        setLucid(Lucid);
+      });
+    }
+  }, [lucid]);
+
+  const doSwap = async () => {
+    if (lucid) {
+      const stakingKey = props.meta.stakeKey;
+      const fromAddress = props.meta.address;
+      const toAsset = props.meta.toAsset;
+      const dcaAmount = props.meta.dcaAmount;
+      const collectFromUTxO = props.meta.utxo;
+
+      const txResult = await swapDCA(
+        lucid,
+        stakingKey,
+        fromAddress,
+        toAsset,
+        dcaAmount,
+        collectFromUTxO
+      );
+      setTxHash(txResult);
+    }
+  };
+
+  // TODO: doHarvest()
+  const doHarvest = async () => {
+    console.log(`Harvest:${props.meta.txHash}#${props.meta.txIdx}`);
+  };
+
+  // TODO: doClose()
+  const doClose = async () => {
+    console.log(`Close:${props.meta.txHash}#${props.meta.txIdx}`);
+  };
+
   // Card title
   const assetPair = `${props.meta.fromAsset} - ${props.meta.toAsset}`;
 
@@ -21,26 +69,39 @@ const AccountCard = (props: any) => {
   // const nextSwap = `Next swap: ${new Date(parseInt(props.meta.nextSwap))}`;
   const cardDetails = (
     <table>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
-        <td valign="top">{props.meta.fromAmount / 1000000}</td>
-      </tr>
-      <tr>
-        <td valign="top">{`Current ${props.meta.toAsset}`}</td>
-        <td valign="top">{props.meta.toAmount}</td>
-      </tr>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{"DCA amount"}</td>
-        <td valign="top">{dcaAmount}</td>
-      </tr>
-      <tr>
-        <td valign="top">{"Period"}</td>
-        <td valign="top">{`${day}${hr}${min}${sec}`}</td>
-      </tr>
-      <tr style={{ backgroundColor: "#EEEEEE" }}>
-        <td valign="top">{"Next swap"}</td>
-        <td valign="top">{`${new Date(parseInt(props.meta.nextSwap))}`}</td>
-      </tr>
+      <tbody>
+        {props.swap && (
+          <tr>
+            <td valign="top">Wallet address</td>
+            <td>{`${props.meta.address.substring(
+              0,
+              10
+            )}...${props.meta.address.substring(
+              props.meta.address.length - 4
+            )}`}</td>
+          </tr>
+        )}
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{`Current ${props.meta.fromAsset}`}</td>
+          <td>{props.meta.fromAmount / 1000000}</td>
+        </tr>
+        <tr>
+          <td valign="top">{`Current ${props.meta.toAsset}`}</td>
+          <td>{props.meta.toAmount}</td>
+        </tr>
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{"DCA amount"}</td>
+          <td>{dcaAmount}</td>
+        </tr>
+        <tr>
+          <td valign="top">{"Swap frequency"}</td>
+          <td>{`${day}${hr}${min}${sec}`}</td>
+        </tr>
+        <tr style={{ backgroundColor: "#EEEEEE" }}>
+          <td valign="top">{"Next swap"}</td>
+          <td>{`${new Date(parseInt(props.meta.nextSwap))}`}</td>
+        </tr>
+      </tbody>
     </table>
   );
 
@@ -52,24 +113,26 @@ const AccountCard = (props: any) => {
         <div className="card-detail">{cardDetails}</div>
 
         <div className="card-actions">
-          <button
-            className="btn m-50"
-            onClick={() => {
-              console.log(`Harvest:${props.meta.txHash}#${props.meta.txIdx}`);
-            }}
-          >
-            Harvest
-          </button>
+          {props.swap && (
+            <button className="btn btn-primary m-50" onClick={doSwap}>
+              Swap
+            </button>
+          )}
 
-          <button
-            className="btn btn-primary m-50"
-            onClick={() => {
-              console.log(`Close:${props.meta.txHash}#${props.meta.txIdx}`);
-            }}
-          >
-            Close
-          </button>
+          {props.harvest && (
+            <button className="btn m-50" onClick={doHarvest}>
+              Harvest
+            </button>
+          )}
+
+          {props.close && (
+            <button className="btn btn-primary m-50" onClick={doClose}>
+              Close
+            </button>
+          )}
         </div>
+
+        {txHash && <div>{txHash}</div>}
       </div>
     </div>
   );

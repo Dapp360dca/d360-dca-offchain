@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import { useStoreState } from "../utils/store";
-
 import { useState, useEffect } from "react";
 import { getAccounts } from "../utils/cardano";
 import AccountGrid from "../components/AccountGrid";
@@ -20,7 +19,7 @@ const Portfolio: NextPage = () => {
         );
 
         if (paymentCredential) {
-          getAccounts(paymentCredential.hash).then((res: any) => {
+          getAccounts(lucid, paymentCredential.hash).then((res: any) => {
             setAccountList(res.addressInfo.accounts);
           });
         } else {
@@ -28,12 +27,12 @@ const Portfolio: NextPage = () => {
         }
       });
     }
-  }, [walletStore.address])
+  }, [walletStore.address]);
 
   return (
     <div>
       <Header />
-      <Navbar/>
+      <Navbar />
       <AccountGrid accounts={accountList} />
     </div>
   );

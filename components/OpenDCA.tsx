@@ -1,6 +1,6 @@
-import { Address, Constr, Data, Lucid } from "lucid-cardano";
+import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
-import { dcaScript } from "../pages/offchain";
+import { openDCA } from "../utils/endpoints";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
 
@@ -10,7 +10,7 @@ const OpenDCA = () => {
   const [txHash, setTxHash] = useState<string>();
 
   useEffect(() => {
-    if (!lucid) {
+    if (walletStore.connected && !lucid) {
       initLucid(walletStore.name).then((Lucid: Lucid) => {
         setLucid(Lucid);
       });
@@ -18,61 +18,29 @@ const OpenDCA = () => {
   }, [lucid]);
   
 
-  const keyAddressWithKeyStakeToData = (address: Address) => {
-    const { paymentCredential, stakeCredential } =
-      lucid!.utils.getAddressDetails(address);
-    return new Constr(0, [
-      new Constr(0, [paymentCredential?.hash!]),
-      new Constr(0, [new Constr(0, [new Constr(0, [stakeCredential?.hash!])])]),
-    ]);
-  };
-
-  const openDCA = async (e: any) => {
+  const doOpenDCA = async (e: any) => {
     e.preventDefault();
 
     if (lucid) {
-      const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
-      const ownerAddress = await lucid.wallet.address();
+      const fromAddress = await lucid.wallet.address();
+      const toAsset = e.target.toAsset.value;
 
-      const dOwner = keyAddressWithKeyStakeToData(ownerAddress); // Owner of the DCA is the owner of the Wallet
-
-      const dFromAsset = new Constr(0, [""]); // Swap from tADA
-
-      const dToAsset = new Constr(0, [e.target.toAsset.value]); // Swap to toAsset
-
-      const dSwapAmmount = BigInt(
-        parseInt(e.target.swapAmount.value) * 1000000
-      ); // Swap tADA * lovelace
-
-      const dNextSwap = new Constr(0, [BigInt(Date.now())]); // Starting from now
+      const depositAmount = parseInt(e.target.depositAmount.value);
+      const swapAmount = parseInt(e.target.swapAmount.value);
 
       const freqPeriod = parseInt(e.target.period.value);
       const freqUnit = parseInt(e.target.unit.value);
-      const dFreq = BigInt(freqPeriod * freqUnit); // Swap frequency
+      const swapFrequency = freqPeriod * freqUnit;
 
-      const dcaDatum = new Constr(0, [
-        dOwner,
-        dFromAsset,
-        dToAsset,
-        dSwapAmmount,
-        dNextSwap,
-        dFreq,
-      ]);
-
-      const tx = await lucid
-        .newTx()
-        .payToContract(
-          dcaScriptAddress,
-          { inline: Data.to(dcaDatum) },
-          { lovelace: BigInt(parseInt(e.target.depositAmount.value) * 1000000) }
-        )
-        .complete();
-
-      const signedTx = await tx.sign().complete();
-      const txHash = await signedTx.submit();
-
-      setTxHash(txHash);
-      return txHash;
+      const txResult = await openDCA(
+        lucid,
+        fromAddress,
+        toAsset,
+        depositAmount,
+        swapAmount,
+        swapFrequency
+      );
+      setTxHash(txResult);
     }
   };
 
@@ -82,7 +50,7 @@ const OpenDCA = () => {
      {walletStore.connected} ?
       (
     <div className='mt-28 mb-6 text-white bg-[#09031B] w-5/12'>
-        <form onSubmit={openDCA} className='shadow-md rounded px-4 pt-6 w-fit m-auto content-center'>
+        <form onSubmit={doOpenDCA} className='shadow-md rounded px-4 pt-6 w-fit m-auto content-center'>
             <div className='font-bold text-3xl bg-white rounded-[5px] text-[#ff4D41] flex justify-center'>OPEN DCA</div>
             <div className=' flex  justify-center mt-6 font-bold text-2xl'>Deposit ADA and open position</div>
             <div className='mt-5'>
@@ -98,7 +66,7 @@ const OpenDCA = () => {
                 <div className="text-2xl w-44"><label htmlFor="toAsset">Select asset</label></div>
                 <div className="ml-6 w-52 bg-white text-black text-2xl rounded-r">
                   <select id="toAsset" name="toAsset"  className='box-border w-52 rounded-r'>
-                    <option value="47e9faf04ae9f5c3bcde980c84e332b84feebc9fa2870cff07239bbe575254">
+                    <option value="f6f49b186751e61f1fb8c64e7504e771f968cea9f4d11f5222b169e374575254">
                         tWRT
                     </option>
                 </select>
@@ -138,4 +106,4 @@ const OpenDCA = () => {
       )
 };
 
-export default OpenDCA
+export default OpenDCA;

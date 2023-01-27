@@ -8,15 +8,17 @@ const AccountGrid = (props: any) => {
           Open Positions
         </div>
         <div className="grid gap-x-0 gap-y-0 grid-cols-3">
-          {props.accounts.length > 0 ? (
-            props.accounts.map((account: any, index: Number) => (
-              <AccountCard key={index} meta={account} />
-            ))
-          ) : 
-           (
-             <img src='/loading.svg' alt="loading" />
-           )
-           }
+          {props.accounts.length
+            ? props.accounts.map((account: any, index: Number) => (
+                <AccountCard
+                  key={index}
+                  meta={account}
+                  swap={props.swap}
+                  harvest={!props.swap}
+                  close={!props.swap}
+                />
+              ))
+            : "Loading..."}
         </div>
       </div>
     </div>
