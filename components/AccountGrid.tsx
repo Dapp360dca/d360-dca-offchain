@@ -1,5 +1,4 @@
 import AccountCard from "./AccountCard";
-// import loading from "../public/loading.svg";
 
 const AccountGrid = (props: any) => {
   return (
@@ -19,8 +18,7 @@ const AccountGrid = (props: any) => {
                   close={!props.swap}
                 />
               ))
-            : "Loading..." // <img src={loading} className="loading" alt="loading" />
-          }
+            : "Loading..."}
         </div>
       </div>
     </div>
