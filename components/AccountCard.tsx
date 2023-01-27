@@ -1,16 +1,8 @@
-import { Constr, Data, Lucid } from "lucid-cardano";
+import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
-import { dcaScript } from "../pages/offchain";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
-import {
-  RequestDatum,
-  RequestMetadaDatum,
-  SwapAction,
-  SwapDirection,
-  AssetClass,
-} from "@wingriders/dex-serializer";
-import mlb from "@dcspark/cardano-multiplatform-lib-browser";
+import { swapDCA } from "../utils/endpoints";
 
 const AccountCard = (props: any) => {
   const walletStore = useStoreState((state: any) => state.wallet);
@@ -25,79 +17,36 @@ const AccountCard = (props: any) => {
     }
   }, [lucid]);
 
-  /*********************************************** Endpoints ***********************************************/
-  const swapDCA = async () => {
+  const doSwap = async () => {
     if (lucid) {
-      // const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
-      // const dcaScriptUtxos = (await lucid.utxosAt(dcaScriptAddress)).filter(
-      //   (utxo) =>
-      //     utxo.txHash === props.meta.txHash &&
-      //     utxo.outputIndex === props.meta.txIdx
-      // );
-      // if (!dcaScriptUtxos[0]) throw new Error("UTxOs not found at the script");
+      const stakingKey = props.meta.stakeKey;
+      const fromAddress = props.meta.address;
+      const toAsset = props.meta.toAsset;
+      const dcaAmount = props.meta.dcaAmount;
+      const collectFromUTxO = props.meta.utxo;
 
-      const wingridersDexAddress =
-        "addr_test1wz6zjuut6mx93dw8jvksqx4zh5zul6j8qg992myvw575gdsgwxjuc"; //Preprod
-
-      const txExpiry = Date.now() + 3600000; // In 1 hour
-      const metadata = new RequestMetadaDatum(
-        mlb.Address.from_bech32(
-          // beneficiary address - taken from dcaScript Datum Params
-          props.meta.address
-        ),
-        mlb.StakeCredential.from_keyhash(
-          mlb.Ed25519KeyHash.from_hex(props.meta.stakeKey) // Someone's staking key???
-        ),
-        mlb.BigInt.from_str(txExpiry.toString()), // Deadline - usually 24 hrs -> Date.now() + 86_400_000
-        AssetClass.from_hex("", ""),
-        AssetClass.from_hex(
-          props.meta.toAsset.substring(0, 56),
-          props.meta.toAsset.substring(56)
-        ) // policy ID and token name
+      const txResult = await swapDCA(
+        lucid,
+        stakingKey,
+        fromAddress,
+        toAsset,
+        dcaAmount,
+        collectFromUTxO
       );
-      const swapAction = new SwapAction(
-        SwapDirection.ATOB,
-        mlb.BigInt.from_str("0")
-      ); // Minimum received
-      // Minimum received is calculated from dcaDetails{dSwapAmmount} and slippage
-      const requestDatum = new RequestDatum(metadata, swapAction);
-      const requestDatumHex = Buffer.from(
-        requestDatum.to_plutus_data().to_bytes()
-      ).toString("hex"); // Should be an easier way?
-
-      const txOutId = props.meta.txHash;
-      const txOutIdx = props.meta.txIdx;
-      const txOutRefParam = new Constr(0, [
-        new Constr(0, [txOutId]),
-        BigInt(txOutIdx),
-      ]);
-      const dcaRedeemerSwap = new Constr(1, []);
-      const dcaRedeemerClose = new Constr(0, [
-        // CloseDCA TxOutRef
-        new Constr(0, [
-          // TxOutRef
-          new Constr(0, [""]), // BuiltinByteString
-          BigInt(0), // txOutRefIdx
-        ]),
-      ]);
-
-      const tx = await lucid
-        .newTx()
-        .payToContract(wingridersDexAddress, requestDatumHex, {
-          lovelace: BigInt(9_000000),
-        })
-        .collectFrom([props.meta.utxo], Data.to(dcaRedeemerClose))
-        .attachSpendingValidator(dcaScript)
-        .complete();
-      const signedTx = await tx.sign().complete();
-      const txHash = await signedTx.submit();
-
-      setTxHash(txHash);
-      return txHash;
+      setTxHash(txResult);
     }
   };
 
-  /*************************************************** UI ***************************************************/
+  // TODO: doHarvest()
+  const doHarvest = async () => {
+    console.log(`Harvest:${props.meta.txHash}#${props.meta.txIdx}`);
+  };
+
+  // TODO: doClose()
+  const doClose = async () => {
+    console.log(`Close:${props.meta.txHash}#${props.meta.txIdx}`);
+  };
+
   // Card title
   const assetPair = `${props.meta.fromAsset} - ${props.meta.toAsset}`;
 
@@ -165,38 +114,25 @@ const AccountCard = (props: any) => {
 
         <div className="card-actions">
           {props.swap && (
-            <button
-              className="btn btn-primary m-50"
-              onClick={() => {
-                console.log(`Swap:${props.meta.txHash}#${props.meta.txIdx}`);
-              }}
-            >
+            <button className="btn btn-primary m-50" onClick={doSwap}>
               Swap
             </button>
           )}
 
           {props.harvest && (
-            <button
-              className="btn m-50"
-              onClick={() => {
-                console.log(`Harvest:${props.meta.txHash}#${props.meta.txIdx}`);
-              }}
-            >
+            <button className="btn m-50" onClick={doHarvest}>
               Harvest
             </button>
           )}
 
           {props.close && (
-            <button
-              className="btn btn-primary m-50"
-              onClick={() => {
-                console.log(`Close:${props.meta.txHash}#${props.meta.txIdx}`);
-              }}
-            >
+            <button className="btn btn-primary m-50" onClick={doClose}>
               Close
             </button>
           )}
         </div>
+
+        {txHash && <div>{txHash}</div>}
       </div>
     </div>
   );

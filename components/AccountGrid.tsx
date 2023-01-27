@@ -19,7 +19,7 @@ const AccountGrid = (props: any) => {
                   close={!props.swap}
                 />
               ))
-            : "" // <img src={loading} className="loading" alt="loading" />
+            : "Loading..." // <img src={loading} className="loading" alt="loading" />
           }
         </div>
       </div>
