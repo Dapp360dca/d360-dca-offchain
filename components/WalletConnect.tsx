@@ -72,10 +72,11 @@ const WalletConnect = () => {
 
     
     const clearState = async () => {
-        if (walletStore.connected)   
+        if (walletStore.connected ||
+            walletStore.name ||
+            window.cardano) 
             {disconnectWallet(walletStore.name)}
     }
-
 
     return (
         <>
@@ -91,7 +92,7 @@ const WalletConnect = () => {
                             <a className='text-white'>{walletStore.address}</a>
                             <CopyToClipboard text={walletStore.address}>
                             <span onClick={() => {setCopied(true)}} data-tooltip-target="tooltip-top" className="flex flex-col justify-center items-center">
-                                <div className='bg-white text-[#021639] rounded-[5px] px-2 py-2 hover:text-[#ff4D41]'>copy address</div>
+                                <div className='bg-white text-[#ff4D41] rounded-[5px] px-2 py-2 hover:text-[#021639]'>copy address</div>
                             </span>
                             </CopyToClipboard>
                                 {copied ? <span data-tooltip-target="tooltip-top"></span>: null}
