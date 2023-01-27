@@ -59,6 +59,13 @@ const WalletConnect = () => {
     }
   };
 
+    
+    const clearState = async () => {
+        if (walletStore.connected ||
+            walletStore.name ||
+            window.cardano) 
+            {disconnectWallet(walletStore.name)}
+        }
   useEffect(() => {
     let wallets = [];
     if (window.cardano) {
@@ -69,12 +76,6 @@ const WalletConnect = () => {
     }
     setAvailableWallets(wallets);
   }, []);
-
-  const clearState = async () => {
-    if (walletStore.connected) {
-      disconnectWallet(walletStore.name);
-    }
-  };
 
   return (
     <div className="dropdown dropdown-end">
