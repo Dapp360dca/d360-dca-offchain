@@ -1,6 +1,7 @@
 import { Address, Constr, Data, Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
 import { dcaScript } from "../pages/offchain";
+import { openDCA } from "../utils/endpoints";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
 
@@ -17,61 +18,29 @@ const OpenDCA = () => {
     }
   }, [lucid]);
 
-  const keyAddressWithKeyStakeToData = (address: Address) => {
-    const { paymentCredential, stakeCredential } =
-      lucid!.utils.getAddressDetails(address);
-    return new Constr(0, [
-      new Constr(0, [paymentCredential?.hash!]),
-      new Constr(0, [new Constr(0, [new Constr(0, [stakeCredential?.hash!])])]),
-    ]);
-  };
-
-  const openDCA = async (e: any) => {
+  const doOpenDCA = async (e: any) => {
     e.preventDefault();
 
     if (lucid) {
-      const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
-      const ownerAddress = await lucid.wallet.address();
+      const fromAddress = await lucid.wallet.address();
+      const toAsset = e.target.toAsset.value;
 
-      const dOwner = keyAddressWithKeyStakeToData(ownerAddress); // Owner of the DCA is the owner of the Wallet
-
-      const dFromAsset = new Constr(0, [""]); // Swap from tADA
-
-      const dToAsset = new Constr(0, [e.target.toAsset.value]); // Swap to toAsset
-
-      const dSwapAmmount = BigInt(
-        parseInt(e.target.swapAmount.value) * 1000000
-      ); // Swap tADA * lovelace
-
-      const dNextSwap = new Constr(0, [BigInt(Date.now())]); // Starting from now
+      const depositAmount = parseInt(e.target.depositAmount.value);
+      const swapAmount = parseInt(e.target.swapAmount.value);
 
       const freqPeriod = parseInt(e.target.period.value);
       const freqUnit = parseInt(e.target.unit.value);
-      const dFreq = BigInt(freqPeriod * freqUnit); // Swap frequency
+      const swapFrequency = freqPeriod * freqUnit;
 
-      const dcaDatum = new Constr(0, [
-        dOwner,
-        dFromAsset,
-        dToAsset,
-        dSwapAmmount,
-        dNextSwap,
-        dFreq,
-      ]);
-
-      const tx = await lucid
-        .newTx()
-        .payToContract(
-          dcaScriptAddress,
-          { inline: Data.to(dcaDatum) },
-          { lovelace: BigInt(parseInt(e.target.depositAmount.value) * 1000000) }
-        )
-        .complete();
-
-      const signedTx = await tx.sign().complete();
-      const txHash = await signedTx.submit();
-
-      setTxHash(txHash);
-      return txHash;
+      const txResult = await openDCA(
+        lucid,
+        fromAddress,
+        toAsset,
+        depositAmount,
+        swapAmount,
+        swapFrequency
+      );
+      setTxHash(txResult);
     }
   };
 
@@ -80,7 +49,7 @@ const OpenDCA = () => {
       {walletStore.connected && (
         // if wallet is connected:
         <div className="mx-80 my-10">
-          <form onSubmit={openDCA}>
+          <form onSubmit={doOpenDCA}>
             <table>
               {/* Deposit amount */}
               <tr>
@@ -98,7 +67,7 @@ const OpenDCA = () => {
                     id="depositAmount"
                     name="depositAmount"
                     placeholder="tADA"
-                    min={1}
+                    min={10}
                     style={{
                       color: "black",
                       margin: "5px",
@@ -155,7 +124,7 @@ const OpenDCA = () => {
                     id="swapAmount"
                     name="swapAmount"
                     placeholder="tADA"
-                    min={1}
+                    min={5}
                     style={{
                       color: "black",
                       margin: "5px",
@@ -167,7 +136,7 @@ const OpenDCA = () => {
                 </td>
               </tr>
 
-              {/* Period */}
+              {/* Swap frequency */}
               <tr>
                 <td>
                   <label
