@@ -31,11 +31,10 @@ const Helios: NextPage = () => {
 
   useEffect(() => {
     if (lucid) {
-    } else {
       initLucid(walletStore.name).then((Lucid: Lucid) => {
         setLucid(Lucid);
       });
-    }
+    }  
   }, [lucid]);
 
   const vestingPolicy: SpendingValidator = {

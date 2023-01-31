@@ -1,6 +1,6 @@
-import { Address, Constr, Data, Lucid } from "lucid-cardano";
+import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
-import { dcaScript } from "../pages/offchain";
+import { openDCA } from "../utils/endpoints";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
 
@@ -17,207 +17,138 @@ const OpenDCA = () => {
     }
   }, [lucid]);
 
-  const keyAddressWithKeyStakeToData = (address: Address) => {
-    const { paymentCredential, stakeCredential } =
-      lucid!.utils.getAddressDetails(address);
-    return new Constr(0, [
-      new Constr(0, [paymentCredential?.hash!]),
-      new Constr(0, [new Constr(0, [new Constr(0, [stakeCredential?.hash!])])]),
-    ]);
-  };
-
-  const openDCA = async (e: any) => {
+  const doOpenDCA = async (e: any) => {
     e.preventDefault();
 
     if (lucid) {
-      const dcaScriptAddress = lucid.utils.validatorToAddress(dcaScript);
-      const ownerAddress = await lucid.wallet.address();
+      const fromAddress = await lucid.wallet.address();
+      const toAsset = e.target.toAsset.value;
 
-      const dOwner = keyAddressWithKeyStakeToData(ownerAddress); // Owner of the DCA is the owner of the Wallet
-
-      const dFromAsset = new Constr(0, [""]); // Swap from tADA
-
-      const dToAsset = new Constr(0, [e.target.toAsset.value]); // Swap to toAsset
-
-      const dSwapAmmount = BigInt(
-        parseInt(e.target.swapAmount.value) * 1000000
-      ); // Swap tADA * lovelace
-
-      const dNextSwap = new Constr(0, [BigInt(Date.now())]); // Starting from now
+      const depositAmount = parseInt(e.target.depositAmount.value);
+      const swapAmount = parseInt(e.target.swapAmount.value);
 
       const freqPeriod = parseInt(e.target.period.value);
       const freqUnit = parseInt(e.target.unit.value);
-      const dFreq = BigInt(freqPeriod * freqUnit); // Swap frequency
+      const swapFrequency = freqPeriod * freqUnit;
 
-      const dcaDatum = new Constr(0, [
-        dOwner,
-        dFromAsset,
-        dToAsset,
-        dSwapAmmount,
-        dNextSwap,
-        dFreq,
-      ]);
-
-      const tx = await lucid
-        .newTx()
-        .payToContract(
-          dcaScriptAddress,
-          { inline: Data.to(dcaDatum) },
-          { lovelace: BigInt(parseInt(e.target.depositAmount.value) * 1000000) }
-        )
-        .complete();
-
-      const signedTx = await tx.sign().complete();
-      const txHash = await signedTx.submit();
-
-      setTxHash(txHash);
-      return txHash;
+      const txResult = await openDCA(
+        lucid,
+        fromAddress,
+        toAsset,
+        depositAmount,
+        swapAmount,
+        swapFrequency
+      );
+      setTxHash(txResult);
     }
   };
 
   return (
-    <div className="flex bg-[image:url('/bgf.jpg')] bg-no-repeat bg-cover bg-center bg-fixed h-screen w-full items-center border border-[#FF4D41]">
-      {walletStore.connected && (
-        // if wallet is connected:
-        <div className="mx-80 my-10">
-          <form onSubmit={openDCA}>
-            <table>
-              {/* Deposit amount */}
-              <tr>
-                <td>
-                  <label
-                    htmlFor="depositAmount"
-                    style={{ color: "black", margin: "10px" }}
-                  >
-                    Deposit amount
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    id="depositAmount"
-                    name="depositAmount"
-                    placeholder="tADA"
-                    min={1}
-                    style={{
-                      color: "black",
-                      margin: "5px",
-                      width: "100px",
-                      textAlign: "right",
-                    }}
-                    required
-                  />
-                </td>
-              </tr>
+    <div className="flex justify-center bg-[image:url('/bgf.jpg')] bg-no-repeat bg-cover bg-center bg-fixed h-screen w-full">
+      {walletStore.connected} ? (
+      <div className="mt-28 mb-6 text-white bg-[#09031B] w-5/12">
+        <form
+          onSubmit={doOpenDCA}
+          className="shadow-md rounded px-4 pt-6 w-fit m-auto content-center"
+        >
+          <div className="font-bold text-3xl bg-white rounded-[5px] text-[#ff4D41] flex justify-center">
+            OPEN DCA
+          </div>
+          <div className=" flex  justify-center mt-6 font-bold text-2xl">
+            Deposit ADA and open position
+          </div>
+          <div className="mt-5">
+            <div className="flex mb-6 border border-[#498AB4] rounded-[10px] h-10">
+              <div className="text-2xl w-44">
+                <label htmlFor="depositAmount">Deposit amount</label>
+              </div>
+              <div className="ml-6 w-52 bg-white text-black text-2xl rounded-r">
+                <input
+                  id="depositAmount"
+                  name="depositAmount"
+                  type={"number"}
+                  min={10}
+                  className="box-content w-52 rounded-r"
+                  style={{ textAlign: "right" }}
+                  placeholder="tADA"
+                  required
+                />
+              </div>
+            </div>
 
-              {/* To asset */}
-              <tr>
-                <td>
-                  <label
-                    htmlFor="toAsset"
-                    style={{ color: "black", margin: "10px" }}
-                  >
-                    To asset
-                  </label>
-                </td>
-                <td>
-                  <select
-                    id="toAsset"
-                    name="toAsset"
-                    style={{
-                      color: "black",
-                      margin: "5px",
-                      width: "100px",
-                      textAlign: "right",
-                    }}
-                    required
-                  >
-                    <option value="f6f49b186751e61f1fb8c64e7504e771f968cea9f4d11f5222b169e374575254">
-                      tWRT
-                    </option>
-                  </select>
-                </td>
-              </tr>
+            <div className="flex mb-6 border border-[#498AB4] rounded-[10px] h-10">
+              <div className="text-2xl w-44">
+                <label htmlFor="toAsset">Select asset</label>
+              </div>
+              <div className="ml-6 w-52 bg-white text-black text-2xl rounded-r">
+                <select
+                  id="toAsset"
+                  name="toAsset"
+                  className="box-border w-52 rounded-r"
+                  style={{ textAlign: "right" }}
+                  required
+                >
+                  <option value="f6f49b186751e61f1fb8c64e7504e771f968cea9f4d11f5222b169e374575254">
+                    tWRT
+                  </option>
+                </select>
+              </div>
+            </div>
 
-              {/* Swap amount */}
-              <tr>
-                <td>
-                  <label
-                    htmlFor="swapAmount"
-                    style={{ color: "black", margin: "10px" }}
-                  >
-                    Swap amount
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    id="swapAmount"
-                    name="swapAmount"
-                    placeholder="tADA"
-                    min={1}
-                    style={{
-                      color: "black",
-                      margin: "5px",
-                      width: "100px",
-                      textAlign: "right",
-                    }}
-                    required
-                  />
-                </td>
-              </tr>
+            <div className="flex mb-6 border border-[#498AB4] rounded-[10px] h-10">
+              <div className="text-2xl w-44">
+                <label htmlFor="swapAmount">Swap amount</label>
+              </div>
+              <div className="ml-6 w-52 bg-white text-black text-2xl rounded-r">
+                <input
+                  id="swapAmount"
+                  name="swapAmount"
+                  type={"number"}
+                  min={5}
+                  className="box-content w-52 rounded-r"
+                  style={{ textAlign: "right" }}
+                  placeholder="tADA"
+                  required
+                />
+              </div>
+            </div>
 
-              {/* Period */}
-              <tr>
-                <td>
-                  <label
-                    htmlFor="frequency"
-                    style={{ color: "black", margin: "10px" }}
-                  >
-                    Frequency
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    id="period"
-                    name="period"
-                    placeholder="1"
-                    min={1}
-                    style={{
-                      color: "black",
-                      margin: "5px",
-                      width: "100px",
-                      textAlign: "right",
-                    }}
-                    required
-                  />
-                  <select
-                    id="unit"
-                    name="unit"
-                    style={{
-                      color: "black",
-                      margin: "5px",
-                    }}
-                    required
-                  >
-                    <option value="86400000">day</option>
-                    <option value="3600000">hour</option>
-                    <option value="60000">min</option>
-                    <option value="1000">sec</option>
-                  </select>
-                </td>
-              </tr>
-            </table>
-
-            <button className="btn m-5" type="submit">
-              Open DCA
+            <div className="flex mb-8 border border-[#498AB4] rounded-[10px] h-10">
+              <div className="text-2xl w-44">
+                <label htmlFor="frequency">Swap frequency</label>
+              </div>
+              <div className="ml-6 w-52 bg-white text-black text-2xl rounded-r">
+                <input
+                  type={"number"}
+                  min={1}
+                  id="period"
+                  name="period"
+                  placeholder="1"
+                  className="box-content w-32"
+                  style={{ textAlign: "right" }}
+                  required
+                />
+                <select className="text-black" id="unit" name="unit" required>
+                  <option value="86400000">day</option>
+                  <option value="3600000">hour</option>
+                  <option value="60000">min</option>
+                  <option value="1000">sec</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="btn border border-[#ff4D41] font-bold bg-[#ffffff] text-[#ff4D41] hover:bg-[#ff4D41] hover:text-white transition duration-200"
+              type="submit"
+            >
+              Submit
             </button>
-          </form>
-
-          {txHash}
-        </div>
-      )}
+          </div>
+        </form>
+        {txHash && <div className="mt-4 mb-10 px-4 py-4">TxHash: {txHash}</div>}
+      </div>
+      )
     </div>
   );
 };
