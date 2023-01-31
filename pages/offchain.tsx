@@ -17,6 +17,7 @@ import {
   Address,
   utf8ToHex,
   OutRef,
+  datumJsonToCbor,
 } from "lucid-cardano";
 import {
   LiquidityPoolDatum,
@@ -205,6 +206,25 @@ const Offchain: NextPage = () => {
     return txHash;
   }
 
+  const Datum = () => Data.empty();
+
+  async function HarvestDCA(): Promise<TxHash> { 
+    const dcaScriptAddress: Address =
+      lucid!.utils.validatorToAddress(dcaScript);
+    const utxos = (await lucid!.utxosAt(dcaScriptAddress)).filter((utxo) => 
+      utxo.datum === Data.empty()) 
+    const tx = await lucid!
+      .newTx()
+      .collectFrom(utxos!, Data.empty())
+      .complete();
+
+    const signedTx = await tx.sign().complete();
+    const txHash = await signedTx.submit();
+
+    return txHash;
+  }
+
+
   return (
     <div className="px-10">
       <div className="navbar bg-base-100">
@@ -236,7 +256,7 @@ const Offchain: NextPage = () => {
             swapDCA();
           }}
         >
-          Swap from Script
+          Close DCA
         </button>
         <button
           className="btn btn-primary m-5"
@@ -244,7 +264,15 @@ const Offchain: NextPage = () => {
             closeDCA();
           }}
         >
-          Close DCA
+         Harvest DCA
+        </button>
+        <button
+          className="btn btn-primary m-5"
+          onClick={() => {
+            HarvestDCA();
+          }}
+        >
+          Swap from Script
         </button>
       </div>
       <div>
