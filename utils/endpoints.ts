@@ -8,7 +8,7 @@ import {
 import { Address, Constr, Data, Lucid, UTxO } from "lucid-cardano";
 import { dcaScript } from "../pages/offchain";
 import { dcaScAddress } from "./cardano";
-import mlb from "@dcspark/cardano-multiplatform-lib-browser";
+import * as mlb from "@dcspark/cardano-multiplatform-lib-browser";
 
 export const wingridersDexAddress =
   "addr_test1wz6zjuut6mx93dw8jvksqx4zh5zul6j8qg992myvw575gdsgwxjuc"; // Preprod
@@ -82,14 +82,18 @@ export const swapDCA = async (
     requestDatum.to_plutus_data().to_bytes()
   ).toString("hex"); // Should be an easier way?
 
-  const dcaRedeemerSwap = new Constr(1, []);
+  // console.log(collectFromUTxO);
+  const { paymentCredential } = lucid.utils.getAddressDetails(dcaScAddress);
+  // const dcaRedeemerSwap = new Constr(1, []);
   const tx = await lucid
     .newTx()
     .payToContract(wingridersDexAddress, requestDatumHex, {
       lovelace: BigInt(dcaAmount),
     })
-    .collectFrom([collectFromUTxO], Data.to(dcaRedeemerSwap))
+    .collectFrom([collectFromUTxO])
+    .readFrom([collectFromUTxO])
     .attachSpendingValidator(dcaScript)
+    .addSignerKey(paymentCredential?.hash!)
     .complete();
   const signedTx = await tx.sign().complete();
   const txHash = await signedTx.submit();

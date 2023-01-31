@@ -1,6 +1,6 @@
 import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
-import { openDCA } from "../utils/endpoints";
+import * as sc from "../utils/endpoints";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
 
@@ -31,7 +31,7 @@ const OpenDCA = () => {
       const freqUnit = parseInt(e.target.unit.value);
       const swapFrequency = freqPeriod * freqUnit;
 
-      const txResult = await openDCA(
+      const txResult = await sc.openDCA(
         lucid,
         fromAddress,
         toAsset,
