@@ -2,7 +2,7 @@ import { Lucid } from "lucid-cardano";
 import { useEffect, useState } from "react";
 import initLucid from "../utils/lucid";
 import { useStoreState } from "../utils/store";
-import { swapDCA } from "../utils/endpoints";
+import * as sc from "../utils/endpoints";
 
 const AccountCard = (props: any) => {
   const walletStore = useStoreState((state: any) => state.wallet);
@@ -25,7 +25,7 @@ const AccountCard = (props: any) => {
       const dcaAmount = props.meta.dcaAmount;
       const collectFromUTxO = props.meta.utxo;
 
-      const txResult = await swapDCA(
+      const txResult = await sc.swapDCA(
         lucid,
         stakingKey,
         fromAddress,
